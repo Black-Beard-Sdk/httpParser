@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{FAB233A5
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editor", "Editor\Editor.csproj", "{AA3D7EBA-40BE-4F11-9CC3-8558981F72FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Powershell.HtmlParser", "Black.Beard.Powershell.HtmlParser\Black.Beard.Powershell.HtmlParser.csproj", "{84BB4D5D-7778-4B37-8CB6-ADCC2F1B63A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +26,14 @@ Global
 		{6B1FF56A-2AF1-4E22-8722-FAE239EF384E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B1FF56A-2AF1-4E22-8722-FAE239EF384E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B1FF56A-2AF1-4E22-8722-FAE239EF384E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA3D7EBA-40BE-4F11-9CC3-8558981F72FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA3D7EBA-40BE-4F11-9CC3-8558981F72FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA3D7EBA-40BE-4F11-9CC3-8558981F72FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA3D7EBA-40BE-4F11-9CC3-8558981F72FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84BB4D5D-7778-4B37-8CB6-ADCC2F1B63A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84BB4D5D-7778-4B37-8CB6-ADCC2F1B63A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84BB4D5D-7778-4B37-8CB6-ADCC2F1B63A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84BB4D5D-7778-4B37-8CB6-ADCC2F1B63A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

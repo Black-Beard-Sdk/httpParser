@@ -44,6 +44,9 @@ LIMIT :     'LIMIT';
 
 USING :     'USING';
 
+HTML :      'HTML';
+TEXT :      'TEXT';
+
 STRING :    'STRING';
 DECIMAL :   'DECIMAL';
 INTEGER :   'INTEGER';
@@ -51,10 +54,13 @@ DATE :      'DATE';
 UUID :      'UUID';
 BOOLEAN :   'BOOLEAN';
 
+TRUE : 'true';
+FALSE : 'false';
+
 // and a superfluous subtoken typecasting of the "QUOTE"
-CHAR_STRING :  '\'' (~('\'' | '\r' | '\n') | '\'\'' | NEWLINE)+ '\'';
+CHAR_STRING :  '\'' (~('\'' | '\r' | '\n') | '\'\'' | NEWLINE)* '\'';
 
-
+DOLLAR :                '$';
 LEFT_PAREN:             '(';
 RIGHT_PAREN:            ')';
 
@@ -93,7 +99,7 @@ NEWLINE: '\r'? '\n';
 fragment
 SPACE: [ \t];
 
-REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
+REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '_' | '#' | [0-9])*;
 
 
 fragment

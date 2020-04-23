@@ -11,6 +11,8 @@ namespace Bb.Sdk.HttpParser.Blocks
         void VisitCallFunction(CallFunctionBlock b, Context context);
         void VisitReadAttribute(ReadAttributeBlock b, Context context);
         void VisitReadInnerText(ReadInnerTextBlock b, Context context);
+        void VisitVariable(ReadVariableBlock b, Context context);
+        void VisitConstant(ReadConstantBlock b, Context context);
     }
 
 }

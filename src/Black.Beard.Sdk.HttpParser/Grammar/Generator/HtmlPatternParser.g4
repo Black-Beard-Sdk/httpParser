@@ -50,8 +50,10 @@ output :
     ;
 
 select : 
-    text COLON (AS type)? SELECT attribute? function? (LEFT_PAREN search RIGHT_PAREN)*
+    (text | variable) COLON (AS type)? selectItem (LEFT_PAREN search RIGHT_PAREN)*
     ;
+
+selectItem : SELECT (attribute | HTML | TEXT | text | numbers | float | boolean | variable) function?;
 
 type : STRING | DECIMAL | INTEGER | DATE | UUID | BOOLEAN;
 
@@ -77,4 +79,7 @@ argument : numbers | text;
 
 key : REGULAR_ID;
 numbers : NUMBER+;
+float : numbers DOT numbers;
 text : CHAR_STRING;
+boolean : TRUE | FALSE;
+variable : DOLLAR key;

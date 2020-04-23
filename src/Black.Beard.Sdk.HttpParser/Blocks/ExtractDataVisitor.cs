@@ -185,6 +185,7 @@ namespace Bb.Sdk.HttpParser.Blocks
 
         private FoundHtmlNode CreateSearchNode(FoundHtmlNode parent, HtmlNode item)
         {
+
             var node = new FoundHtmlNode()
             {
                 Message = item.Name,
@@ -251,8 +252,8 @@ namespace Bb.Sdk.HttpParser.Blocks
                 value = items[0];
 
             JProperty result = new JProperty(b.PropertyName, value);
-
             PushOutput("new property " + b.PropertyName, context, parent, result);
+
         }
 
         private void BuildArray(Context context, List<JToken> items, FoundHtmlNode parent)
@@ -269,6 +270,7 @@ namespace Bb.Sdk.HttpParser.Blocks
             foreach (JProperty item in items)
                 result.Add(item);
             PushOutput("new object ", context, parent, result);
+
         }
 
         private void PushOutput(string message, Context context, FoundHtmlNode parent, JToken result)
@@ -297,9 +299,11 @@ namespace Bb.Sdk.HttpParser.Blocks
             List<string> values = new List<string>();
 
             context.Value = parent.Tag;
-            b.Function.Accept(this, context);
-            values.Add(context.Value.ToString());
-
+            if (b.Function != null)
+            {
+                b.Function.Accept(this, context);
+                values.Add(context.Value?.ToString());
+            }
 
             List<JValue> jvalues = new List<JValue>();
 
@@ -314,17 +318,35 @@ namespace Bb.Sdk.HttpParser.Blocks
                 value = new JArray(jvalues);
 
 
-            var p = new JProperty(b.Label, value);
+            string name = b.Label;
 
-            if (context.Results.Count > 0)
+            if (b.IsVariable)
+                SetVariable(name, value, parent.Id);
+
+            else
             {
-                var result = context.Results.Peek();
-                result.Add(p);
+
+                if (name.StartsWith("$"))
+                {
+                    var n1 = GetVariable(name);
+                    if (n1 != null)
+                        name = n1.ToString();
+                }
+
+                var p = new JProperty(name, value);
+
+                if (context.Results.Count > 0)
+                {
+                    var result = context.Results.Peek();
+                    result.Add(p);
+                }
+
+                var n = new FoundHtmlNode() { Message = "Select " + p.ToString(), SelectNode = true, Parent = parent.Id };
+                if (Selected != null)
+                    this.Selected(n);
+
             }
 
-            var n = new FoundHtmlNode() { Message = "Select " + p.ToString(), SelectNode = true, Parent = parent.Id };
-            if (Selected != null)
-                this.Selected(n);
 
         }
 
@@ -367,7 +389,15 @@ namespace Bb.Sdk.HttpParser.Blocks
         {
 
             var node = context.Value as HtmlNode;
-            context.Value = node.InnerText;
+
+            if (b.Html)
+                context.Value = node.InnerHtml;
+
+            else if (b.Text)
+                context.Value = node.InnerText;
+
+            else
+                context.Value = null;
 
             if (b.Sub != null)
                 b.Sub.Accept(this, context);
@@ -385,6 +415,18 @@ namespace Bb.Sdk.HttpParser.Blocks
 
         }
 
+        public void VisitConstant(ReadConstantBlock b, Context context)
+        {
+            context.Value = b.Value;
+        }
+
+        public void VisitVariable(ReadVariableBlock b, Context context)
+        {
+            context.Value = GetVariable(b.Name);
+        }
+
+
+
         public void VisitCallFunction(CallFunctionBlock b, Context context)
         {
 
@@ -398,9 +440,37 @@ namespace Bb.Sdk.HttpParser.Blocks
         public Action<ErrorModel> Error { get; set; }
 
 
+        private void SetVariable(string name, object value, Guid parent)
+        {
+            if (_variables.ContainsKey(name))
+                _variables[name] = value;
+            else
+                _variables.Add(name, value);
+
+            var n = new FoundHtmlNode() { Message = $"SET {name}={value}", SearchNode = true, Parent = parent };
+            if (Selected != null)
+                this.Selected(n);
+
+
+        }
+
+        private object GetVariable(string name)
+        {
+            if (_variables.ContainsKey(name))
+                return _variables[name];
+
+            _variables.Add(name, null);
+
+            return null;
+
+        }
+
+
+
         private readonly BlockList _config;
         private JToken Output;
-        //private List<int> _indexes;
+        private Dictionary<string, object> _variables = new Dictionary<string, object>();
+
     }
 
 }

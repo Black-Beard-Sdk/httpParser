@@ -245,7 +245,7 @@ namespace Bb.Sdk.HttpParser.Grammar
 
         /// <summary>
         /// select : 
-        ///     text COLON (AS type)? SELECT attribute? function? (LEFT_PAREN search RIGHT_PAREN)*
+        ///     (text | variable) COLON (AS type)? selectItem (LEFT_PAREN search RIGHT_PAREN)*
         ///     ;
         /// </summary>
         /// <param name="context"></param>
@@ -253,7 +253,18 @@ namespace Bb.Sdk.HttpParser.Grammar
         public override object VisitSelect([NotNull] HtmlPatternParser.SelectContext context)
         {
 
-            string label = (string)VisitText(context.text());
+            string label;
+            bool isVariable = false;
+
+            var txt = context.text();
+
+            if (txt != null)
+                label = (string)VisitText(txt);
+            else
+            {
+                isVariable = true;
+                label = (string)VisitVariable(context.variable());
+            }
 
             //(int, int) pagination = (1, -1);
 
@@ -261,31 +272,19 @@ namespace Bb.Sdk.HttpParser.Grammar
             //if (p != null)
             //    pagination = ((int, int))VisitPagination(p);
 
-            List<Block> results = new List<Block>();
             Block function = null;
-
-            var t2 = context.attribute();
-            if (t2 != null)
-            {
-                var attributeName = (string)VisitAttribute(t2);
-                var b1 = new ReadAttributeBlock() { Name = attributeName };
-                function = b1;
-                var f = context.function();
-                if (f != null)
-                    b1.Sub = (CallFunctionBlock)VisitFunction(f);
-            }
-            else
-            {
-                var b2 = new ReadInnerTextBlock();
-                function = b2;
-                var f = context.function();
-                if (f != null)
-                    b2.Sub = (CallFunctionBlock)VisitFunction(f);
-            }
+            List<Block> results = new List<Block>();
+            var i = context.selectItem();
+            if (i != null)
+                function = (Block)VisitSelectItem(i);
 
             TypeEnum type = TypeEnum.String;
             if (context.AS() != null)
-                type = (TypeEnum)VisitType(context.type());
+            {
+                var _type = context.type();
+                if (_type != null)
+                    type = (TypeEnum)VisitType(_type);
+            }
 
             var searchs = context.search();
             if (searchs != null)
@@ -299,6 +298,8 @@ namespace Bb.Sdk.HttpParser.Grammar
                 //Skip = pagination.Item1,
                 //Limit = pagination.Item2,
                 Function = function,
+                IsVariable = isVariable,
+                Type = type,
             };
 
             result.Subs.AddRange(results.OrderBy(c => c.Order));
@@ -308,12 +309,131 @@ namespace Bb.Sdk.HttpParser.Grammar
         }
 
         /// <summary>
+        /// selectItem : SELECT (attribute | HTML | TEXT | text | numbers | float | boolean | variable) function?;
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override object VisitSelectItem([NotNull] HtmlPatternParser.SelectItemContext context)
+        {
+
+            SubsBlock function;
+
+            var t2 = context.attribute();
+            if (t2 != null)
+            {
+                var attributeName = (string)VisitAttribute(t2);
+                function = new ReadAttributeBlock() { Name = attributeName };
+            }
+            else
+            {
+
+                var text = context.text();
+                if (text != null)
+                {
+                    function = new ReadConstantBlock()
+                    {
+                        Order = text.Start.StartIndex,
+                        Value = VisitText(text),
+                    };
+                }
+                else
+                {
+                    var integers = context.numbers();
+                    if (integers != null)
+                    {
+                        function = new ReadConstantBlock()
+                        {
+                            Order = integers.Start.StartIndex,
+                            Value = VisitNumbers(integers),
+                        };
+                    }
+                    else
+                    {
+                        var floats = context.@float();
+                        if (floats != null)
+                        {
+                            function = new ReadConstantBlock()
+                            {
+                                Order = floats.Start.StartIndex,
+                                Value = VisitFloat(floats),
+                            };
+                        }
+                        else
+                        {
+                            var booleans = context.boolean();
+                            if (booleans != null)
+                            {
+                                function = new ReadConstantBlock()
+                                {
+                                    Order = booleans.Start.StartIndex,
+                                    Value = VisitBoolean(booleans),
+                                };
+                            }
+                            else
+                            {
+                                var variables = context.variable();
+                                if (variables != null)
+                                {
+                                    function = new ReadVariableBlock()
+                                    {
+                                        Order = variables.Start.StartIndex,
+                                        Name = (string)VisitVariable(variables),
+                                    };
+                                }
+                                else
+                                {
+                                    function = new ReadInnerTextBlock()
+                                    {
+                                        Html = context.HTML() != null,
+                                        Text = context.TEXT() != null,
+                                    };
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            var f = context.function();
+            if (f != null)
+                function.Sub = (CallFunctionBlock)VisitFunction(f);
+
+            return function;
+
+        }
+
+        /// <summary>
+        /// float : numbers DOT numbers;
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override object VisitFloat([NotNull] HtmlPatternParser.FloatContext context)
+        {
+
+            var txt = context.GetText();
+
+            if (float.TryParse(txt, out float f))
+                return f;
+
+            return 0f;
+
+        }
+
+        public override object VisitBoolean([NotNull] HtmlPatternParser.BooleanContext context)
+        {
+            var txt = context.GetText();
+            return txt == "true";
+        }
+
+        /// <summary>
         /// type : STRING | DECIMAL | INTEGER | DATE | UUID;
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
         public override object VisitType([NotNull] HtmlPatternParser.TypeContext context)
         {
+
             if (context == null)
                 return TypeEnum.String;
 
@@ -339,13 +459,13 @@ namespace Bb.Sdk.HttpParser.Grammar
 
                 case "BOOLEAN":
                     return TypeEnum.Boolean;
+
                 default:
                     break;
-
             }
 
+            return TypeEnum.String;
 
-            return base.VisitType(context);
         }
 
         /// <summary>
@@ -561,6 +681,15 @@ namespace Bb.Sdk.HttpParser.Grammar
 
         }
 
+        /// <summary>
+        /// variable : DOLLAR key;
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override object VisitVariable([NotNull] HtmlPatternParser.VariableContext context)
+        {
+            return context.GetText();
+        }
 
         /// <summary>
         /// REGULAR_ID

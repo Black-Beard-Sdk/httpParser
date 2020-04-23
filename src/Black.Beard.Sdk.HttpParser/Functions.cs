@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Bb.Sdk.HttpParser
 {
@@ -9,6 +10,21 @@ namespace Bb.Sdk.HttpParser
         static Functions()
         {
             _reg = new Regex(@"-[A-Z]{2,2}\d+", RegexOptions.None);
+        }
+
+        public static string Match(string test, string pattern)
+        {
+
+            try
+            {
+                var reg = new Regex(pattern, RegexOptions.None);
+                var e = reg.Match(test);
+                if (e.Success)
+                    return e.Value;
+            }
+            catch (Exception) { }
+
+            return string.Empty;
         }
 
         public static string GetBourseReference(string test)

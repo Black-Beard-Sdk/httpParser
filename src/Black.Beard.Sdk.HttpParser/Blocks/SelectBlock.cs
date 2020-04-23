@@ -23,6 +23,7 @@ namespace Bb.Sdk.HttpParser.Blocks
         public TypeEnum Type { get; internal set; }
 
         public Block Function { get; internal set; }
+        public bool IsVariable { get; internal set; }
 
         public override void Accept(IBlockVisitor visitor, Context context)
         {
@@ -38,7 +39,7 @@ namespace Bb.Sdk.HttpParser.Blocks
         Integer,
         Date,
         Uuid,
-        Boolean
+        Boolean,
     }
 
 }

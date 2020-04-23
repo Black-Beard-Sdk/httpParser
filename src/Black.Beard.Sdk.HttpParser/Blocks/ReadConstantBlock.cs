@@ -1,13 +1,16 @@
 ﻿namespace Bb.Sdk.HttpParser.Blocks
 {
 
-    public class ReadAttributeBlock : SubsBlock
+
+    public class ReadConstantBlock : SubsBlock
     {
-        public string Name { get; internal set; }
+
+        public object Value { get; internal set; }
+
 
         public override void Accept(IBlockVisitor visitor, Context context)
         {
-            visitor.VisitReadAttribute(this, context);
+            visitor.VisitConstant(this, context);
         }
 
     }

@@ -1,0 +1,26 @@
+﻿
+
+select Start external program and write : 
+
+	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+
+
+in the command line arguments write : 
+
+	-noexit -command import-Module .\Black.Beard.Powershell.HtmlParser.dll
+
+
+if you have an error write : 
+
+	Set-ExecutionPolicy RemoteSigned
+
+
+If you want to see commands in the module
+	Get-Command -module Black.Beard.Powershell.HtmlParser
+
+
+
+Convert-DocumentJsonToCsv -OutputFilename C:\Users\g.beard\Desktop\bourse\dividende.csv -Path C:\Users\g.beard\Desktop\bourse\dividendes.json -RemoveOutputFileIfExist $true -WriteHeaders $true
+
+
+Convert-DocumentJsonToExcel -OutputFilename C:\Users\g.beard\Desktop\bourse\dividende.xlsx -Path C:\Users\g.beard\Desktop\bourse\dividendes.json -RemoveOutputFileIfExist $true -SheetName "dividendes"

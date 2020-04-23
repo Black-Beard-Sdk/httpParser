@@ -69,6 +69,12 @@ public interface IHtmlPatternParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSelect([NotNull] HtmlPatternParser.SelectContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="HtmlPatternParser.selectItem"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSelectItem([NotNull] HtmlPatternParser.SelectItemContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="HtmlPatternParser.type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -123,10 +129,28 @@ public interface IHtmlPatternParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNumbers([NotNull] HtmlPatternParser.NumbersContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="HtmlPatternParser.float"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFloat([NotNull] HtmlPatternParser.FloatContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="HtmlPatternParser.text"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitText([NotNull] HtmlPatternParser.TextContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HtmlPatternParser.boolean"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBoolean([NotNull] HtmlPatternParser.BooleanContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="HtmlPatternParser.variable"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitVariable([NotNull] HtmlPatternParser.VariableContext context);
 }
 } // namespace Bb.Sdk.HttpParser.Grammar.Generated

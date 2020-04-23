@@ -12,7 +12,10 @@ namespace Bb.Sdk.HttpParser
 
         public SessionHttp(Uri uriRoot)
         {
-            this.UserAgent = Assembly.GetEntryAssembly().GetName().Name + ".NET client";
+
+            var i = Assembly.GetEntryAssembly()?.GetName()?.Name;
+
+            this.UserAgent = i ?? ".NET client";
             this.BaseAddress = uriRoot;
             this.Cookies = new Dictionary<string, Cookie>();
         }
@@ -43,7 +46,10 @@ namespace Bb.Sdk.HttpParser
 
             var headers = request.Headers;
             headers.Clear();
-            headers.Add(Constants.Headers.UserAgent, this.UserAgent);
+
+            request.UserAgent = this.UserAgent;
+
+            //headers.Add(Constants.Headers.UserAgent, this.UserAgent);
 
             foreach (var item in this.Cookies)
                 request.CookieContainer.Add(item.Value);
